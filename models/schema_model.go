@@ -1,9 +1,10 @@
-package main
+package models
 
 import (
 	"fmt"
 	"slices"
 	"strings"
+	"ultratype/utils"
 )
 
 type Tag struct {
@@ -24,23 +25,69 @@ func (t *Tag) String(maybeNullable bool) string {
 	return f
 }
 
+type InternalType int
+
+const (
+	Integer InternalType = iota
+	Long
+	Float
+	Double
+	Bool
+	String
+
+	List
+	Map
+
+	Custom
+)
+
+type Type struct {
+	Kind           InternalType
+	Nullable       bool
+	Generics       []Type
+	CustomTypeName *string
+}
+
+func (t Type) String() string {
+	v := ""
+
+	switch t.Kind {
+	case Integer:
+		v = "int"
+	case Long:
+		v = "long"
+	case Float:
+		v = "float"
+	case Double:
+		v = "double"
+	case Bool:
+		v = "bool"
+	case String:
+		v = "string"
+	case List:
+		v = t.Generics[0].String() + "[]"
+	case Map:
+		v = "map[" + t.Generics[0].String() + "]" + t.Generics[1].String()
+	case Custom:
+		v = *t.CustomTypeName
+	}
+
+	if t.Nullable {
+		v += "?"
+	}
+
+	return v
+}
+
 type SchemaField struct {
 	FieldName string
-	Type      string
+	Kind      Type
 	Tags      []Tag
 }
 
 type SchemaModel struct {
 	ClassName string
 	Fields    []SchemaField
-}
-
-func padRight(s string, width int) string {
-	k := string(s)
-	for len(k) < width {
-		k += " "
-	}
-	return k
 }
 
 func (s *SchemaModel) Pretty() string {
@@ -59,10 +106,10 @@ func (s *SchemaModel) Pretty() string {
 
 	for _, field := range s.Fields {
 		names = append(names, field.FieldName)
-		types = append(types, field.Type)
+		types = append(types, field.Kind.String())
 
 		longestName = max(longestName, len(field.FieldName))
-		longestType = max(longestType, len(field.Type))
+		longestType = max(longestType, len(field.Kind.String()))
 
 		for _, tag := range field.Tags {
 			forTag := tag.TagFor
@@ -86,16 +133,16 @@ func (s *SchemaModel) Pretty() string {
 	tags = slices.Compact(tags)
 
 	for _, field := range s.Fields {
-		f := fmt.Sprintf("  %s %s", padRight(field.FieldName, longestName), padRight(field.Type, longestType))
+		f := fmt.Sprintf("  %s %s", utils.PadRight(field.FieldName, longestName), utils.PadRight(field.Kind.String(), longestType))
 
 		for _, tag := range tags {
 			if slices.Contains(fieldTags[field.FieldName], tag) {
 				t := slices.IndexFunc(field.Tags, func(tx Tag) bool {
 					return tx.TagFor == tag
 				})
-				f += "  " + padRight(field.Tags[t].String(hasNullVariant[tag]), byTags[tag])
+				f += "  " + utils.PadRight(field.Tags[t].String(hasNullVariant[tag]), byTags[tag])
 			} else {
-				f += "  " + padRight("-", byTags[tag])
+				f += "  " + utils.PadRight("-", byTags[tag])
 			}
 		}
 

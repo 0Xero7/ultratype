@@ -1,6 +1,7 @@
 Person:
-  FirstName      string    dynamodbav :"firstname"  json :"firstname"  mongo:"firstname"  -           
-  LastName       string    dynamodbav :"lastname"   json :"lastname"   -                  -           
-  Email          string    dynamodbav :"-"          json :"email"      -                  yaml:"email"
-  Nickname       string?   dynamodbav?:"nickname"   json?:"nickname"   -                  -           
-  FavoriteColors string[]  dynamodbav :"favColors"  json :"favColors"  -                  -           
+  FirstName      string                  dynamodbav :"firstname"  json :"firstname"  mongo:"firstname"  -           
+  LastName       string                  dynamodbav :"lastname"   json :"lastname"   -                  -           
+  Email          string                  dynamodbav :"-"          json :"email"      -                  yaml:"email"
+  Nickname       int?                    dynamodbav?:"nickname"   json?:"nickname"   -                  -           
+  FavoriteColors string?[]?              dynamodbav :"favColors"  json :"favColors"  -                  -           
+  Test           map[Something]string??  dynamodbav :"favColors"  json :"favColors"  -                  -           

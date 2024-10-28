@@ -13,5 +13,8 @@ func main() {
 	switch os.Args[1] {
 	case "tidy":
 		Tidy(os.Args)
+
+	case "gen":
+		Generate(os.Args)
 	}
 }
