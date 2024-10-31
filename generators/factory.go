@@ -16,6 +16,9 @@ func GetGenerator(language string) Generator {
 	switch language {
 	case "go":
 		return GoLang{}
+
+	case "typescript":
+		return TypeScript{}
 	}
 
 	log.Panic("Language", language, "not supported.")
